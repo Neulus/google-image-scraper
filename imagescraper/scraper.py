@@ -35,8 +35,8 @@ class GoogleScraper:
                     data.append({
                         'preview_image': json.loads(af_string[i-1][af_string[i-1].find('https://encrypted-tbn0.gstatic.com') - 2:])[0],
                         'image_url': json.loads(text[1:])[0],
-                        'title': str(title),
-                        'url': str(url)
+                        'title': str(title).encode().decode('unicode_escape'),
+                        'url': str(url).encode().decode('unicode_escape')
                     })
             i += 1
         return data
