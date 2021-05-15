@@ -30,13 +30,13 @@ class GoogleScraper:
             if 'https://' in text:
                 if 'gstatic.com' in af_string[i-1]:
                     meta_string = af_string[i+3][af_string[i+3].find('http')-1:]
-                    url = meta_string[1:meta_string.find('",')-2]
+                    url = meta_string[1:meta_string.find('",')]
                     title = meta_string[meta_string.find('","')+3: meta_string.find('",null')]
                     data.append({
                         'preview_image': json.loads(af_string[i-1][af_string[i-1].find('https://encrypted-tbn0.gstatic.com') - 2:])[0],
                         'image_url': json.loads(text[1:])[0],
-                        'title': url,
-                        'url': title
+                        'title': str(title),
+                        'url': str(url)
                     })
             i += 1
         return data
