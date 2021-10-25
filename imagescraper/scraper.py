@@ -35,7 +35,7 @@ class GoogleScraper:
         result = []
 
         for data in af_data['data']:
-            if data:
+            if isinstance(data, list):
                 if len(data) == 1:
                     if 'b-GRID_STATE0' in data[0]:
                         for inside_data in data[0]:
