@@ -5,7 +5,7 @@ import random
 from urllib import parse
 from typing import List
 from .abc import SearchResult
-from .utils import generate_google_request, parse_data, parse_google_json
+from .utils import generate_google_request, parse_google_json, parse_response
 
 LOAD_IMAGE_RPCID = 'HoAMBc'
 
@@ -54,14 +54,9 @@ class GoogleScraper:
         result = []
         cursor = {}
 
-        for data in af_data['data']:
-            if isinstance(data, list):
-                if len(data) == 1:
-                    if 'b-GRID_STATE0' in data[0]:
-                        parse_result, last_cursor = parse_data(data)
-                        cursor = last_cursor
-                        result = result + parse_result
-                        break
+        parse_result, last_cursor = parse_response(af_data['data'])
+        result = result + parse_result
+        cursor = last_cursor
 
         while len(result) < amount:
             if cursor == {}:
@@ -83,7 +78,7 @@ class GoogleScraper:
             site_data = site_text[5:].split('\n')[2]
             site_data = parse_google_json(site_data)
 
-            parse_result, last_cursor = parse_data(data)
+            parse_result, last_cursor = parse_response(site_data)
             cursor = last_cursor
             result = result + parse_result
 

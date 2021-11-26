@@ -37,36 +37,39 @@ def parse_google_json(data) -> list:
     return loads(data)
 
 
-def parse_data(data) -> Tuple(list, dict):
+def parse_response(response) -> Tuple[list, dict]:
     """
-    Parse the data from the search result.
+    Parse the response from the search result.
     """
     results = []
     cursor = {}
-    if isinstance(data, list):
-        if len(data) == 1:
-            if 'b-GRID_STATE0' in data[0]:
-                for inside_data in data[0]:
-                    if isinstance(inside_data, list):
-                        if 'GRID_STATE0' in inside_data:
-                            for outer_item in inside_data:
-                                if isinstance(outer_item, list):
-                                    if len(outer_item) > 0:
-                                        for item in outer_item:
-                                            if isinstance(item, list):
-                                                if len(item) > 5:
-                                                    if isinstance(item[0], int) and isinstance(item[1], list):
-                                                        results.append(SearchResult(
-                                                            item[1][9]['2003'][3], item[1][3][0], item[1][9]['2003'][2], item[1][2][0]))
-                                        if isinstance(outer_item[0], bool):
-                                            cursor.update({
-                                                'second_list': outer_item[2:],
-                                            })
-                                        elif isinstance(outer_item[0], int):
-                                            first_list = outer_item[:]
-                                            first_list[6] = []
-                                            first_list[7] = []
-                                            cursor.update({
-                                                'first_list': first_list,
-                                            })
+    for data in response:
+        if isinstance(data, list):
+            if len(data) == 1:
+                if 'b-GRID_STATE0' in data[0]:
+                    for inside_data in data[0]:
+                        if isinstance(inside_data, list):
+                            if 'GRID_STATE0' in inside_data:
+                                for outer_item in inside_data:
+                                    if isinstance(outer_item, list):
+                                        if len(outer_item) > 0:
+                                            for item in outer_item:
+                                                if isinstance(item, list):
+                                                    if len(item) > 5:
+                                                        if isinstance(item[0], int) and isinstance(item[1], list):
+                                                            results.append(SearchResult(
+                                                                item[1][9]['2003'][3], item[1][3][0], item[1][9]['2003'][2], item[1][2][0]))
+                                            if isinstance(outer_item[0], bool):
+                                                cursor.update({
+                                                    'second_list': outer_item[2:],
+                                                })
+                                            elif isinstance(outer_item[0], int):
+                                                first_list = outer_item[:]
+                                                first_list[6] = []
+                                                first_list[7] = []
+                                                cursor.update({
+                                                    'first_list': first_list,
+                                                })
+                                break
+
     return results, cursor
