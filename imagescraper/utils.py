@@ -1,8 +1,9 @@
 from json import loads, dumps
+from typing import Tuple
 from .abc import SearchResult
 
 
-def generate_google_request(action, query, cursor):
+def generate_google_request(action, query, cursor) -> str:
     """
     Generates request for google /batchexecute endpoint
     """
@@ -19,7 +20,7 @@ def generate_google_request(action, query, cursor):
     return request
 
 
-def parse_google_json(data):
+def parse_google_json(data) -> list:
     """
     Converts Google's json to normal python list
     """
@@ -36,7 +37,7 @@ def parse_google_json(data):
     return loads(data)
 
 
-def parse_data(data):
+def parse_data(data) -> Tuple(list, dict):
     """
     Parse the data from the search result.
     """

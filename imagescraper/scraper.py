@@ -3,6 +3,8 @@ import demjson
 import re
 import random
 from urllib import parse
+from typing import List
+from .abc import SearchResult
 from .utils import generate_google_request, parse_data, parse_google_json
 
 LOAD_IMAGE_RPCID = 'HoAMBc'
@@ -22,11 +24,11 @@ class GoogleScraper:
             r"window.WIZ_global_data = {(.|\n)*?}"
         )
 
-    async def close(self):
+    async def close(self) -> None:
         """Closes aiohttp session"""
         await self._session.close()
 
-    async def scrape(self, query: str, amount=100, safe_search=False) -> list:
+    async def scrape(self, query: str, amount=100, safe_search=False) -> List[SearchResult]:
         """Scrapes image from google"""
         query = parse.quote(query)
 

@@ -10,3 +10,9 @@ class SearchResult:
 
     def __repr__(self) -> str:
         return f'<SearchResult image_url={self.image_url}>'
+
+    def __hash__(self) -> int:
+        return hash(self.image_url)
+
+    def __eq__(self, other) -> bool:
+        return self.image_url == other.image_url
