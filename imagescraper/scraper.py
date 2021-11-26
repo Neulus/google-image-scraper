@@ -1,58 +1,88 @@
 import aiohttp
 import demjson
 import re
+import random
+from urllib import parse
+from .utils import generate_google_request, parse_data, parse_google_json
+
+LOAD_IMAGE_RPCID = 'HoAMBc'
 
 
 class GoogleScraper:
     """Google Image Scrapper"""
 
-    def __init__(self, host='https://google.com') -> None:
+    def __init__(self, host='https://www.google.com') -> None:
         self.host = host
         self._session = aiohttp.ClientSession(
             headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'})
 
         self.af_data_regex = re.compile(
             r"AF_initDataCallback\({key: 'ds:1'(.|\n)*?}}")
+        self.wiz_regex = re.compile(
+            r"window.WIZ_global_data = {(.|\n)*?}"
+        )
 
     async def close(self):
         """Closes aiohttp session"""
         await self._session.close()
 
-    async def scrape(self, query: str, safe_search=False) -> list:
+    async def scrape(self, query: str, amount=100, safe_search=False) -> list:
         """Scrapes image from google"""
+        query = parse.quote(query)
+
         url = '{0}/search?q={1}&tbm=isch'.format(
             self.host, query + '&safe=active' if safe_search else query)
+
         site = await self._session.get(url)
         if site.status != 200:
             raise Exception('Google is weird today')
         site_data = await site.text()
+        site.close()
+
+        wiz_data_result = self.wiz_regex.search(site_data)
+        wiz_string = wiz_data_result.group(0).replace(
+            'window.WIZ_global_data = ', '') + '}'
+        wiz_data = demjson.decode(wiz_string)
 
         af_data_result = self.af_data_regex.search(site_data)
-
         af_string = af_data_result.group(0).replace(
             'AF_initDataCallback', '').strip('()')
         af_data = demjson.decode(af_string)
+
         result = []
+        cursor = {}
 
         for data in af_data['data']:
             if isinstance(data, list):
                 if len(data) == 1:
                     if 'b-GRID_STATE0' in data[0]:
-                        for inside_data in data[0]:
-                            if isinstance(inside_data, list):
-                                if 'GRID_STATE0' in inside_data:
-                                    for outer_item in inside_data:
-                                        if isinstance(outer_item, list):
-                                            if len(outer_item) > 0:
-                                                for item in outer_item:
-                                                    if isinstance(item, list):
-                                                        if len(item) > 5:
-                                                            if isinstance(item[0], int) and isinstance(item[1], list):
-                                                                result.append({
-                                                                    'preview_image': item[1][2][0],
-                                                                    'image_url': item[1][3][0],
-                                                                    'title': item[1][9]['2003'][3],
-                                                                    'url': item[1][9]['2003'][2]
-                                                                })
+                        parse_result, last_cursor = parse_data(data)
+                        cursor = last_cursor
+                        result = result + parse_result
                         break
-        return result
+
+        while len(result) < amount:
+            if cursor == {}:
+                raise Exception('No cursor provided from google.')
+
+            request = generate_google_request(LOAD_IMAGE_RPCID, query, cursor)
+            site = await self._session.post(
+                self.host + '/_/VisualFrontendUi/data/batchexecute' +
+                '?rpcids=' + LOAD_IMAGE_RPCID +
+                '&f.sid=' + wiz_data.get('FdrFJe') +
+                '&bl=' + wiz_data.get('cfb2h') +
+                '&hl=en-US&soc-app=1&soc-platform=1&soc-device=1&_reqid=' +
+                str(random.randint(10000, 200000)) + '&rt=c', data={'f.req': request, 'at': wiz_data.get('SNlM0e'), '': ''})
+            if site.status != 200:
+                raise Exception('Google is weird today')
+
+            site_text = await site.text()
+            site.close()
+            site_data = site_text[5:].split('\n')[2]
+            site_data = parse_google_json(site_data)
+
+            parse_result, last_cursor = parse_data(data)
+            cursor = last_cursor
+            result = result + parse_result
+
+        return result[:amount]
