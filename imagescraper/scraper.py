@@ -1,9 +1,29 @@
-import aiohttp
-import demjson
+""""
+The MIT License (MIT)
+Copyright (c) 2021-present Alpha-1004
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+"""
+
 import re
 import random
 from urllib import parse
 from typing import List
+import aiohttp
+import demjson
 from .abc import SearchResult
 from .utils import generate_google_request, parse_google_json, parse_response
 
@@ -16,7 +36,8 @@ class GoogleScraper:
     def __init__(self, host='https://www.google.com') -> None:
         self.host = host
         self._session = aiohttp.ClientSession(
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'})
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' +
+                     'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'})
 
         self.af_data_regex = re.compile(
             r"AF_initDataCallback\({key: 'ds:1'(.|\n)*?}}")
@@ -69,7 +90,8 @@ class GoogleScraper:
                 '&f.sid=' + wiz_data.get('FdrFJe') +
                 '&bl=' + wiz_data.get('cfb2h') +
                 '&hl=en-US&soc-app=1&soc-platform=1&soc-device=1&_reqid=' +
-                str(random.randint(10000, 200000)) + '&rt=c', data={'f.req': request, 'at': wiz_data.get('SNlM0e'), '': ''})
+                str(random.randint(10000, 200000)) + '&rt=c',
+                data={'f.req': request, 'at': wiz_data.get('SNlM0e'), '': ''})
             if site.status != 200:
                 raise Exception('Google is weird today')
 
