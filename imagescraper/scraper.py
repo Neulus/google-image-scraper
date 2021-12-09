@@ -58,7 +58,8 @@ class GoogleScraper:
 
         site = await self._session.get(url)
         if site.status != 200:
-            raise Exception('Google is weird today')
+            raise Exception(
+                'Google returned status code {0} for main site'.format(site.status))
         site_data = await site.text()
         site.close()
 
@@ -93,7 +94,8 @@ class GoogleScraper:
                 str(random.randint(10000, 200000)) + '&rt=c',
                 data={'f.req': request, 'at': wiz_data.get('SNlM0e'), '': ''})
             if site.status != 200:
-                raise Exception('Google is weird today')
+                raise Exception(
+                    'Google returned status code {0} for /batchexecute'.format(site.status))
 
             site_text = await site.text()
             site.close()

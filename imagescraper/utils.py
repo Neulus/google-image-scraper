@@ -55,8 +55,7 @@ def parse_google_json(data) -> list:
     data = data.replace('\\r', '\r')
     data = data.replace('\\b', '\b')
     data = data.replace('\\f', '\f')
-    data = data[21:]
-    data = data[:-28]
+    data = data[21:-28]
     return loads(data)
 
 
