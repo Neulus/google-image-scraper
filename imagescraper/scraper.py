@@ -51,10 +51,10 @@ class GoogleScraper:
 
     async def scrape(self, query: str, amount=100, safe_search=False) -> List[SearchResult]:
         """Scrapes image from google"""
-        query_safe = parse.quote(query)
+        query_url_encoded = parse.quote(query)
 
         url = '{0}/search?q={1}&tbm=isch'.format(
-            self.host, query_safe + '&safe=active' if safe_search else query)
+            self.host, query_url_encoded + '&safe=active' if safe_search else query_url_encoded)
 
         site = await self._session.get(url)
         if site.status != 200:
