@@ -20,6 +20,7 @@ DEALINGS IN THE SOFTWARE.
 from json import loads, dumps
 from typing import Tuple
 from .abc import SearchResult
+from .exceptions import ParseException
 
 
 def generate_google_request(action, query, cursor) -> str:
@@ -95,5 +96,11 @@ def parse_response(response) -> Tuple[list, dict]:
                                                         'first_list': first_list,
                                                     })
                                     break
+
+    if len(results) == 0:
+        raise ParseException('No results found')
+
+    if cursor == {}:
+        raise ParseException('Cursor not found')
 
     return results, cursor

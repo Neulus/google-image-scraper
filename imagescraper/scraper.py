@@ -26,6 +26,10 @@ import aiohttp
 import demjson
 from .abc import SearchResult
 from .utils import generate_google_request, parse_google_json, parse_response
+from .exceptions import (
+    ServerException,
+    CursorException
+)
 
 LOAD_IMAGE_RPCID = 'HoAMBc'
 
@@ -58,7 +62,7 @@ class GoogleScraper:
 
         site = await self._session.get(url)
         if site.status != 200:
-            raise Exception(
+            raise ServerException(
                 'Google returned status code {0} for main site'.format(site.status))
         site_data = await site.text()
         site.close()
@@ -82,7 +86,7 @@ class GoogleScraper:
 
         while len(result) < amount:
             if cursor == {}:
-                raise Exception('No cursor provided from google.')
+                raise CursorException('No cursor provided from google.')
 
             request = generate_google_request(LOAD_IMAGE_RPCID, query, cursor)
             site = await self._session.post(
@@ -94,7 +98,7 @@ class GoogleScraper:
                 str(random.randint(10000, 200000)) + '&rt=c',
                 data={'f.req': request, 'at': wiz_data.get('SNlM0e'), '': ''})
             if site.status != 200:
-                raise Exception(
+                raise ServerException(
                     'Google returned status code {0} for /batchexecute'.format(site.status))
 
             site_text = await site.text()
