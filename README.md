@@ -8,7 +8,7 @@ It can scrape images without selenium.
 ## Installation
 
 ```sh
-$ git clone https://github.com/Alpha-1004/google-image-scraper
+$ git clone https://github.com/Neulus/google-image-scraper
 $ cd google-image-scraper
 
 # MacOs/Linux

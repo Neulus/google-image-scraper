@@ -1,6 +1,6 @@
 """"
 The MIT License (MIT)
-Copyright (c) 2021-present Alpha-1004
+Copyright (c) 2021-present Neulus
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation
@@ -25,8 +25,8 @@ with open('requirements.txt') as f:
 
 setup(
     name='google-image-scraper',
-    author='Alpha-1004',
-    url='https://github.com/Alpha-1004/google-image-scraper',
+    author='Neulus',
+    url='https://github.com/Neulus/google-image-scraper',
     version='2.0.1',
     packages=['imagescraper'],
     license='MIT',
