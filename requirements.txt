@@ -1,2 +1,2 @@
-aiohttp==3.7.4
+aiohttp==3.8.1
 demjson==2.2.4
