@@ -39,22 +39,67 @@ class GoogleScraper:
 
     def __init__(self, host='https://www.google.com') -> None:
         self.host = host
+        self.safe_session = False
         self._session = aiohttp.ClientSession(
             headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' +
-                     'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'})
+                     ' AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'})
 
         self.af_data_regex = re.compile(
             r"AF_initDataCallback\({key: 'ds:1'(.|\n)*?}}")
         self.wiz_regex = re.compile(
             r"window.WIZ_global_data = {(.|\n)*?}"
         )
+        self.setpref_regex = re.compile(
+            r"setprefs\?(.)*?;safeui=images")
 
     async def close(self) -> None:
         """Closes aiohttp session"""
         await self._session.close()
 
+    async def enable_safe_search(self) -> None:
+        """Enables safe search"""
+        async with self._session.get(self.host + '/safesearch') as site:
+            if site.status != 200:
+                raise ServerException(
+                    'Google returned status code {0} for safesearch'.format(site.status))
+            site_data = await site.text()
+
+            setpref_result = self.setpref_regex.search(site_data)
+            setpref_string = '/' + \
+                setpref_result.group(0).replace(
+                    '&amp;', '&').replace('images', 'on')
+            setpref_string = parse.unquote(setpref_string)
+            async with self._session.get(self.host + setpref_string) as resp:
+                if resp.status != 200:
+                    raise ServerException(
+                        'Seems like safe search is not available for your country. Try to remove safe_search=True')
+                self.safe_session = True
+
+    async def disable_safe_search(self) -> None:
+        """Disables safe search"""
+        async with self._session.get(self.host + '/safesearch') as site:
+            if site.status != 200:
+                raise ServerException(
+                    'Google returned status code {0} for safesearch'.format(site.status))
+            site_data = await site.text()
+
+            setpref_result = self.setpref_regex.search(site_data)
+            setpref_string = '/' + \
+                setpref_result.group(0).replace(
+                    '&amp;', '&')
+            setpref_string = parse.unquote(setpref_string)
+            async with self._session.get(self.host + setpref_string) as resp:
+                if resp.status != 200:
+                    raise ServerException(
+                        'Seems like safe search is not available for your country. Try to remove safe_search=True')
+                self.safe_session = False
+
     async def scrape(self, query: str, amount=100, safe_search=False) -> List[SearchResult]:
         """Scrapes image from google"""
+        if safe_search and not self.safe_session:
+            await self.enable_safe_search()
+        if not safe_search and self.safe_session:
+            await self.disable_safe_search()
         query_url_encoded = parse.quote(query)
 
         url = '{0}/search?q={1}&tbm=isch'.format(
