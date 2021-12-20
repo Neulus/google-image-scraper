@@ -37,12 +37,13 @@ LOAD_IMAGE_RPCID = 'HoAMBc'
 class GoogleScraper:
     """Google Image Scrapper"""
 
-    def __init__(self, host='https://www.google.com') -> None:
+    def __init__(self, host='https://www.google.com', language='en-US,en;') -> None:
         self.host = host
         self.safe_session = False
         self._session = aiohttp.ClientSession(
             headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' +
-                     ' AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'})
+                     ' AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36',
+                     'Accept-Language': language})
 
         self.af_data_regex = re.compile(
             r"AF_initDataCallback\({key: 'ds:1'(.|\n)*?}}")
