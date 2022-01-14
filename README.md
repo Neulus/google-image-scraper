@@ -1,4 +1,5 @@
 # google-image-scraper
+[![Updates](https://pyup.io/repos/github/Neulus/google-image-scraper/shield.svg)](https://pyup.io/repos/github/Neulus/google-image-scraper/) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/bc69cecd3c84469097c70a404fadf679)](https://www.codacy.com/gh/Neulus/google-image-scraper/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Neulus/google-image-scraper&amp;utm_campaign=Badge_Grade)
 
 Google image scraper is a tool to scrape images from google. It uses aiohttp and regex to scrape original image, preview image, metadatas.
 It can scrape images without selenium.
