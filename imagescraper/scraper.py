@@ -37,9 +37,10 @@ LOAD_IMAGE_RPCID = 'HoAMBc'
 class GoogleScraper:
     """Google Image Scrapper"""
 
-    def __init__(self, host='https://www.google.com', language='en-US,en;') -> None:
+    def __init__(self, host='https://www.google.com', language='en-US,en;q=0.5') -> None:
         self.host = host
         self.safe_session = False
+        self.ncr_applied = False
         self._session = aiohttp.ClientSession(
             headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' +
                      ' AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36',
@@ -95,8 +96,19 @@ class GoogleScraper:
                         'Seems like safe search is not available for your country. Try to remove safe_search=True')
                 self.safe_session = False
 
+    async def apply_ncr(self) -> None:
+        """Enables ncr"""
+        async with self._session.get(self.host + '/ncr') as site:
+            if site.status != 200:
+                raise ServerException(
+                    'Google returned status code {0} for ncr'.format(site.status))
+            else:
+                self.ncr_applied = True
+
     async def scrape(self, query: str, amount=100, safe_search=False) -> List[SearchResult]:
         """Scrapes image from google"""
+        if self.ncr_applied is False:
+            await self.apply_ncr()
         if safe_search and not self.safe_session:
             await self.enable_safe_search()
         if not safe_search and self.safe_session:
