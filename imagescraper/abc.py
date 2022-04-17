@@ -20,6 +20,10 @@ DEALINGS IN THE SOFTWARE.
 
 
 class SearchResult:
+    """
+    Search result object
+    """
+
     def __init__(self, title, image_url, url, preview_image) -> None:
         self.preview_image = preview_image
         self.image_url = image_url
@@ -30,7 +34,12 @@ class SearchResult:
         return f"{self.image_url}"
 
     def __repr__(self) -> str:
-        return f'<SearchResult image_url={self.image_url}>'
+        return '<SearchResult title={0} image_url={1} url={2} preview_image={3}>'.format(
+            repr(self.title),
+            repr(self.image_url),
+            repr(self.url),
+            repr(self.preview_image)
+        )
 
     def __hash__(self) -> int:
         return hash(self.image_url)
