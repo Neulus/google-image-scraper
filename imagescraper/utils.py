@@ -57,7 +57,7 @@ def parse_google_json(data) -> list:
     data = data.replace('\\b', '\b')
     data = data.replace('\\f', '\f')
     data = data[21:-28]
-    return loads(data)
+    return loads(data, strict=False)
 
 
 def parse_response(response) -> Tuple[list, dict]:
