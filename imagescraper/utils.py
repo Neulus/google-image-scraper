@@ -69,38 +69,42 @@ def parse_response(response) -> Tuple[list, dict]:
     """
     results = []
     cursor = {}
+    import pyperclip
+    import json
+    pyperclip.copy(json.dumps(response))
     for data in response:
         if isinstance(data, list):
-            for container in data:
-                if isinstance(container, list):
-                    if len(container) == 1:
-                        if isinstance(container[0], list):
-                            if (len(container[0][0]) > 1) and (isinstance(container[0][0][0][0], dict)) and (isinstance(container[0][0][1][0], dict)):
-                                outer_holder = container[0][0]
-                                cursor_holder = next(
-                                    iter(outer_holder[0][0].values()))
-                                search_result_holder = outer_holder[1][0]
+            for total in data:
+                if isinstance(total, list):
+                    if len(total) > 0:
+                        for container in total:
+                            if isinstance(container, list):
+                                if isinstance(container[0], list) and (len(container[0]) > 1):
+                                    outer_holder = container[0]
+                                    cursor_holder = next(
+                                        iter(outer_holder[0][0].values()))
+                                    search_result_holder = outer_holder[1][0]
 
-                                for cursor_list in cursor_holder:
-                                    if isinstance(cursor_list, list):
-                                        if 'GRID_STATE0' in cursor_list:
-                                            for cursor_item in cursor_list:
-                                                if isinstance(cursor_item, list):
-                                                    if len(cursor_item) > 1:
-                                                        if isinstance(cursor_item[0], bool):
-                                                            cursor.update(
-                                                                {'second_list': cursor_item[2:]})
-                                                        elif isinstance(cursor_item[0], int):
-                                                            cursor.update(
-                                                                {'first_list': cursor_item})
-                                            break
+                                    for cursor_list in cursor_holder:
+                                        if isinstance(cursor_list, list):
+                                            if 'GRID_STATE0' in cursor_list:
+                                                for cursor_item in cursor_list:
+                                                    if isinstance(cursor_item, list):
+                                                        if len(cursor_item) > 1:
+                                                            if isinstance(cursor_item[0], bool):
+                                                                cursor.update(
+                                                                    {'second_list': cursor_item[2:]})
+                                                            elif isinstance(cursor_item[0], int):
+                                                                cursor.update(
+                                                                    {'first_list': cursor_item})
+                                                break
 
-                                for search_item in search_result_holder:
-                                    search_data = next(
-                                        iter(search_item[0][0].values()))
-                                    results.append(SearchResult(
-                                        search_data[1][9]['2003'][3], search_data[1][3][0],
-                                        search_data[1][9]['2003'][2], search_data[1][2][0]))
+                                    for search_item in search_result_holder:
+                                        search_data = next(
+                                            iter(search_item[0][0].values()))
+                                        results.append(SearchResult(
+                                            search_data[1][9]['2003'][3], search_data[1][3][0],
+                                            search_data[1][9]['2003'][2], search_data[1][2][0]))
 
     if len(results) == 0:
         raise ParseException('No results found')
