@@ -29,11 +29,14 @@ def generate_google_request(action, query, cursor) -> str:
     """
     request = dumps(
         [
-            None, None, cursor['first_list'], None, None,
-            None, None, None, None, None, None, None, None,
-            None, None, None, None, None, None, None, None,
-            None, None, None, None, None, None, None,
-            [query], None, None, None, None, None, None,
+            None, None, cursor['first_list'], None, None, None,
+            None, None, None, None, None, None, None, None, None,
+            None, None, None, None, None, None, None, None, None,
+            None, None, None, None,
+            [query, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, None, None, None, None,
+             None, None, None, "lnms", None, None, None, None, None,
+             None, None, None, []], None, None, None, None, None, None,
             None, None, cursor['second_list'], None, False
         ]
     )
@@ -70,32 +73,34 @@ def parse_response(response) -> Tuple[list, dict]:
         if isinstance(data, list):
             for container in data:
                 if isinstance(container, list):
-                    if 'b-GRID_STATE0' in container:
-                        for inside_data in container:
-                            if isinstance(inside_data, list):
-                                if 'GRID_STATE0' in inside_data:
-                                    for outer_item in inside_data:
-                                        if isinstance(outer_item, list):
-                                            if len(outer_item) > 0:
-                                                for item in outer_item:
-                                                    if isinstance(item, list):
-                                                        if len(item) > 5:
-                                                            if isinstance(item[0], int) and isinstance(item[1], list):
-                                                                results.append(SearchResult(
-                                                                    item[1][9]['2003'][3], item[1][3][0],
-                                                                    item[1][9]['2003'][2], item[1][2][0]))
-                                                if isinstance(outer_item[0], bool):
-                                                    cursor.update({
-                                                        'second_list': outer_item[2:],
-                                                    })
-                                                elif isinstance(outer_item[0], int):
-                                                    first_list = outer_item[:]
-                                                    first_list[6] = []
-                                                    first_list[7] = []
-                                                    cursor.update({
-                                                        'first_list': first_list,
-                                                    })
-                                    break
+                    if len(container) == 1:
+                        if isinstance(container[0], list):
+                            if len(container[0][0]) > 1:
+                                outer_holder = container[0][0]
+                                cursor_holder = next(
+                                    iter(outer_holder[0][0].values()))
+                                search_result_holder = outer_holder[1][0]
+
+                                for cursor_list in cursor_holder:
+                                    if isinstance(cursor_list, list):
+                                        if 'GRID_STATE0' in cursor_list:
+                                            for cursor_item in cursor_list:
+                                                if isinstance(cursor_item, list):
+                                                    if len(cursor_item) > 1:
+                                                        if isinstance(cursor_item[0], bool):
+                                                            cursor.update(
+                                                                {'second_list': cursor_item[2:]})
+                                                        elif isinstance(cursor_item[0], int):
+                                                            cursor.update(
+                                                                {'first_list': cursor_item})
+                                            break
+
+                                for search_item in search_result_holder:
+                                    search_data = next(
+                                        iter(search_item[0][0].values()))
+                                    results.append(SearchResult(
+                                        search_data[1][9]['2003'][3], search_data[1][3][0],
+                                        search_data[1][9]['2003'][2], search_data[1][2][0]))
 
     if len(results) == 0:
         raise ParseException('No results found')

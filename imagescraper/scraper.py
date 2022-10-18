@@ -155,6 +155,7 @@ class GoogleScraper:
                 '&hl=en-US&soc-app=1&soc-platform=1&soc-device=1&_reqid=' +
                 str(random.randint(10000, 200000)) + '&rt=c',
                 data={'f.req': request, 'at': wiz_data.get('SNlM0e'), '': ''})
+
             if site.status != 200:
                 raise ServerException(
                     'Google returned status code {0} for /batchexecute'.format(site.status))
