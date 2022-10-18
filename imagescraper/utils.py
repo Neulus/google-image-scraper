@@ -88,8 +88,6 @@ def parse_response(response) -> Tuple[list, dict]:
                                                 for cursor_item in cursor_list:
                                                     if isinstance(cursor_item, list):
                                                         if len(cursor_item) > 1:
-                                                            # TODO: REMOVE
-                                                            print(cursor_item)
                                                             if isinstance(cursor_item[0], bool):
                                                                 cursor.update(
                                                                     {'second_list': cursor_item[2:]})
@@ -101,6 +99,8 @@ def parse_response(response) -> Tuple[list, dict]:
                                     for search_item in search_result_holder:
                                         search_data = next(
                                             iter(search_item[0][0].values()))
+                                        # TODO: REMOVE
+                                        print(search_data)
                                         results.append(SearchResult(
                                             search_data[1][9]['2003'][3], search_data[1][3][0],
                                             search_data[1][9]['2003'][2], search_data[1][2][0]))
