@@ -69,9 +69,6 @@ def parse_response(response) -> Tuple[list, dict]:
     """
     results = []
     cursor = {}
-    import pyperclip
-    import json
-    pyperclip.copy(json.dumps(response))
     for data in response:
         if isinstance(data, list):
             for total in data:
