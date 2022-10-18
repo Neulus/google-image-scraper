@@ -99,12 +99,14 @@ def parse_response(response) -> Tuple[list, dict]:
                                     for search_item in search_result_holder:
                                         search_data = next(
                                             iter(search_item[0][0].values()))
-                                        # TODO: REMOVE
-                                        print(search_data)
-                                        results.append(SearchResult(
-                                            search_data[1][9]['2003'][3], search_data[1][3][0],
-                                            search_data[1][9]['2003'][2], search_data[1][2][0]))
-
+                                        try:
+                                            results.append(SearchResult(
+                                                search_data[1][9]['2003'][3], search_data[1][3][0],
+                                                search_data[1][9]['2003'][2], search_data[1][2][0]))
+                                        except Exception as e:
+                                            # TODO: REMOVE
+                                            print(search_data)
+                                            raise e from None
     if len(results) == 0:
         raise ParseException('No results found')
 
