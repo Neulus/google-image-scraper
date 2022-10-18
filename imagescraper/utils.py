@@ -75,7 +75,7 @@ def parse_response(response) -> Tuple[list, dict]:
                 if isinstance(container, list):
                     if len(container) == 1:
                         if isinstance(container[0], list):
-                            if (len(container[0][0]) > 1) and (isinstance(container[0][0][0][0], dict)):
+                            if (len(container[0][0]) > 1) and (isinstance(container[0][0][0][0], dict)) and (isinstance(container[0][0][1][0], dict)):
                                 outer_holder = container[0][0]
                                 cursor_holder = next(
                                     iter(outer_holder[0][0].values()))
