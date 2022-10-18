@@ -88,6 +88,8 @@ def parse_response(response) -> Tuple[list, dict]:
                                                 for cursor_item in cursor_list:
                                                     if isinstance(cursor_item, list):
                                                         if len(cursor_item) > 1:
+                                                            # TODO: REMOVE
+                                                            print(cursor_item)
                                                             if isinstance(cursor_item[0], bool):
                                                                 cursor.update(
                                                                     {'second_list': cursor_item[2:]})
