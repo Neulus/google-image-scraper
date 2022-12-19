@@ -101,9 +101,10 @@ def parse_response(response) -> Tuple[list, dict]:
                                             iter(search_item[0][0].values()))
 
                                         if isinstance(search_data[1], list):
+                                            last_index = len(search_data[1]) - 1
                                             results.append(SearchResult(
-                                                search_data[1][9]['2003'][3], search_data[1][3][0],
-                                                search_data[1][9]['2003'][2], search_data[1][2][0]))
+                                                search_data[1][last_index]['2003'][3], search_data[1][3][0],
+                                                search_data[1][last_index]['2003'][2], search_data[1][2][0]))
 
     if len(results) == 0:
         raise ParseException('No results found')
