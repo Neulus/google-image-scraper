@@ -23,7 +23,7 @@ import random
 from urllib import parse
 from typing import List
 import aiohttp
-import demjson
+import demjson3
 from .abc import SearchResult
 from .utils import generate_google_request, parse_google_json, parse_response
 from .exceptions import (
@@ -128,12 +128,12 @@ class GoogleScraper:
         wiz_data_result = self.wiz_regex.search(site_data)
         wiz_string = wiz_data_result.group(0).replace(
             'window.WIZ_global_data = ', '') + '}'
-        wiz_data = demjson.decode(wiz_string)
+        wiz_data = demjson3.decode(wiz_string)
 
         af_data_result = self.af_data_regex.search(site_data)
         af_string = af_data_result.group(0).replace(
             'AF_initDataCallback', '').strip('()')
-        af_data = demjson.decode(af_string)
+        af_data = demjson3.decode(af_string)
 
         result = []
         cursor = {}
